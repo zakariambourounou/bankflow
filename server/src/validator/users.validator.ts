@@ -87,9 +87,9 @@ export const validateUserSchema = z.object({
 
 
 
-
+// schema de validation pour le changement de mot de passe
 export const passwordChangeSchema = z.object({
-    oldPassword: z.string().min(8, "Le mot de passe actuel doit contenir au moins 8 caractères"),
+    oldPassword: z.string().min(1, "Le mot de passe actuel doit contenir au moins 8 caractères"),
     newPassword: passwordSchema,
 });
 
@@ -103,3 +103,6 @@ export const passwordChangeSchema = z.object({
 
 // modifer le userSchema pour permettre la mise à jour partielle des champs
 export const userInputSchema = userSchema.partial().omit({ password: true });
+export type UserInput = z.infer<typeof userSchema>;
+export type UserUpdateInput = z.infer<typeof userInputSchema>;
+export type validateUserInput = z.infer<typeof validateUserSchema>;

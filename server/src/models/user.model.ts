@@ -1,5 +1,4 @@
-import {userInputSchema} from '../validator/users.validator';
-
+import {userInputSchema, validateUserInput} from '../validator/users.validator';
 
 import { pool } from '../db';
 
@@ -137,4 +136,23 @@ async function reactivateUser(id: number): Promise<PublicUser | null> {
   return result.rows[0] as PublicUser;
 }
 
-export { User, PublicUser, Agence, getUserById, findUserByEmail, createUser, updateUser, desactivateUser, reactivateUser };
+
+//validation du role de l'utilisateur ainsi que l'agence a laquel il est affilié 
+async function validateUserAccount(id: number, data: validateUserInput): Promise<PublicUser | null> {
+  const { role, agenceId } = data;
+  const result = await pool.query(
+    `UPDATE users
+     SET role = $2, agence_id = $3
+     WHERE id = $1
+     RETURNING id, email, first_name AS "firstName", last_name AS "lastName",
+               role, agence_id AS "agenceId", is_active AS "isActive",
+               created_at AS "createdAt", updated_at AS "updatedAt"`,
+    [id, role, agenceId]
+  );
+  if (result.rows.length === 0) {
+    return null;
+  }
+  return result.rows[0] as PublicUser;
+}
+
+export { User, PublicUser, Agence, getUserById, findUserByEmail, createUser, updateUser, desactivateUser, reactivateUser, validateUserAccount };
