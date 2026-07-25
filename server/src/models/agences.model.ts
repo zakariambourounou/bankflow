@@ -3,10 +3,7 @@ import { AgenceInput, AgenceUpdateInput } from '../validator/agences.validator';
 
 interface Agence {
   id: number;
-  nom: string;
-  code: string;
-  isActive: boolean;
-  adresse: string | null;  // nullable car pas de "not null" dans le \d
+  
   createdAt: Date;
 }
 

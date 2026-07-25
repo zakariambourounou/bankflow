@@ -1,3 +1,6 @@
+import {userInputSchema} from '../validator/users.validator';
+
+
 import { pool } from '../db';
 
 interface User {
