@@ -74,13 +74,29 @@ export const userSchema = z.object({
     ),
   password: passwordSchema,
 
-  agenceId: z.number().int().positive().optional(),
-  role: z.enum(["conseiller", "admin"]),
-  isActive: z.boolean().optional(),
+ 
 });
 
+//schema de validation pour la mise à jour d'un utilisateur
+
+export const validateUserSchema = z.object({
+  role: z.enum(["conseiller", "admin"]),
+  agenceId: z.number().int().positive().nullable(),
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // modifer le userSchema pour permettre la mise à jour partielle des champs
-export const userInputSchema = userSchema
-  .partial()
-  .omit({ password: true })
-  .omit({ agenceId: true });
+export const userInputSchema = userSchema.partial().omit({ password: true });
