@@ -88,7 +88,10 @@ export const validateUserSchema = z.object({
 
 
 
-
+export const passwordChangeSchema = z.object({
+    oldPassword: passwordSchema,
+    newPassword: passwordSchema,
+});
 
 
 
