@@ -1,4 +1,4 @@
-import { pool } from '../src/db';
+import { pool } from '../db';
 import { AgenceInput, AgenceUpdateInput } from '../validator/agences.validator';
 
 interface Agence {

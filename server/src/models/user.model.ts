@@ -1,4 +1,4 @@
-import { pool } from '../src/db';
+import { pool } from '../db';
 
 interface User {
   id: number;
