@@ -6,6 +6,6 @@ const router = Router();
 router.get('/', listAgences);
 router.get('/:id', getAgencyById);
 router.post('/', newAgences);
-router.put('/:id', modifyAgence);
+router.patch('/:id', modifyAgence);
 
 export default router;
