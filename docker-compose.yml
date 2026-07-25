@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bankflow-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bankflow_user
+      POSTGRES_PASSWORD: bankflow_password
+      POSTGRES_DB: bankflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - bankflow_pgdata:/var/lib/postgresql/data
+
+volumes:
+  bankflow_pgdata:
