@@ -89,7 +89,7 @@ export const validateUserSchema = z.object({
 
 
 export const passwordChangeSchema = z.object({
-    oldPassword: passwordSchema,
+    oldPassword: z.string().min(8, "Le mot de passe actuel doit contenir au moins 8 caractères"),
     newPassword: passwordSchema,
 });
 
