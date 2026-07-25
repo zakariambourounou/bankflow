@@ -1,7 +1,7 @@
 
-import {getAllAgences,getAgenceById,createAgence ,updateAgence} from '../models/agences.model';
+import {getAllAgences,getAgenceById,createAgence ,updateAgence } from '../models/agences.model';
 import { Request, Response } from 'express';
-import {agenceSchema} from '../validator/agences.validator';
+import {agenceSchema , agenceInputSchema} from '../validator/agences.validator';
 
 
 
@@ -70,7 +70,7 @@ export const modifyAgence = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Id invalide' });
   }
 
-  const validation = agenceSchema.safeParse(req.body);
+  const validation = agenceInputSchema.safeParse(req.body);
 
   if (!validation.success) {
     return res.status(400).json({
