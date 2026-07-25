@@ -1,6 +1,41 @@
 import { z } from "zod";
 
 export const userSchema = z.object({
+
+
+    firstName: z
+    .string()
+    .trim()
+    .pipe(
+      z
+        .string()
+        .min(2, {
+          message: "Le prénom doit contenir au moins 2 caractères",
+        })
+        .max(50, {
+          message: "Le prénom doit contenir au plus 50 caractères",
+        })
+        .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/, {
+          message: "Le prénom contient des caractères non autorisés",
+        })
+    ),
+
+  lastName: z
+    .string()
+    .trim()
+    .pipe(
+      z
+        .string()
+        .min(2, {
+          message: "Le nom doit contenir au moins 2 caractères",
+        })
+        .max(50, {
+          message: "Le nom doit contenir au plus 50 caractères",
+        })
+        .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/, {
+          message: "Le nom contient des caractères non autorisés",
+        })
+    ),
   email: z
     .string()
     .trim()
