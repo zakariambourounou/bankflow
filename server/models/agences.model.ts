@@ -76,10 +76,13 @@ async function deactivateAgence(id: number): Promise<Agence | null> {
 // modification d'une agence (nom, code, adresse)
 
 async function updateAgence(id: number, agenceData: AgenceUpdateInput): Promise<Agence | null> {
-  const { nom, code, adresse, is_active =true  } = agenceData;
+  const { nom, code, adresse, is_active   } = agenceData;
   const result = await pool.query(
     `UPDATE agences
-     SET nom = $1, code = $2, adresse = $3, is_active = $4
+     SET nom = COALESCE($1, nom),
+         code = COALESCE($2, code),
+         adresse = COALESCE($3, adresse),
+         is_active = COALESCE($4, is_active)
      WHERE id = $5
      RETURNING id, nom, code, adresse, is_active AS "isActive", created_at AS "createdAt"`,
     [nom, code, adresse, is_active, id]

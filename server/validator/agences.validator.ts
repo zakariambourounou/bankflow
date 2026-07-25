@@ -9,5 +9,8 @@ export const agenceSchema = z.object({
   is_active: z.boolean().optional(),
 });
 
+// modification du schéma pour permettre la mise à jour partielle des champs
+export const  agenceInputSchema = agenceSchema.partial()
+
 export type AgenceInput = z.infer<typeof agenceSchema>;
-export type AgenceUpdateInput = Partial<AgenceInput>;
+export type AgenceUpdateInput = z.infer<typeof agenceInputSchema>;
