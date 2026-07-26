@@ -69,14 +69,14 @@ async function findUserByEmail(email: string): Promise<User | null> {
 async function createUser(
   userData: Omit<UserInput, "password"> & { passwordHash: string },
 ): Promise<PublicUser> {
-  const { email, passwordHash, firstName, lastName } = userData;
+  const { email, passwordHash, firstName, lastName,} = userData;
   const result = await pool.query(
-    `INSERT INTO users ( email, password_hash, first_name, last_name) 
-     VALUES ($1, $2, $3, $4) 
+    `INSERT INTO users ( email, password_hash, first_name, last_name, role) 
+     VALUES ($1, $2, $3, $4, $5) 
      RETURNING id, email, first_name AS "firstName", last_name AS "lastName",               
      role, agence_id AS "agenceId", is_active AS "isActive", 
      created_at AS "createdAt", updated_at AS "updatedAt"`,
-    [email, passwordHash, firstName, lastName],
+    [email, passwordHash, firstName, lastName, "conseillier"],
   );
   return result.rows[0] as PublicUser;
 }
