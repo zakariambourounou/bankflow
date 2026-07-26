@@ -1,6 +1,10 @@
-import {userInputSchema, validateUserInput} from '../validator/users.validator';
+import {
+  userInputSchema,
+  validateUserInput,
+  UserUpdateInput,
+} from "../validator/users.validator";
 
-import { pool } from '../db';
+import { pool } from "../db";
 
 interface User {
   id: number;
@@ -8,34 +12,33 @@ interface User {
   passwordHash: string;
   firstName: string;
   lastName: string;
-  role: 'conseiller' | 'admin';
-  agenceId: number | null;  // nullable, admins n'appartiennent pas forcément à une agence
+  role: "conseiller" | "admin";
+  agenceId: number | null; // nullable, admins n'appartiennent pas forcément à une agence
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
-type PublicUser = Omit<User, 'passwordHash'>; 
+type PublicUser = Omit<User, "passwordHash">;
 
 interface Agence {
   id: number;
   nom: string;
   code: string;
-  adresse: string | null;  // nullable car pas de "not null" dans le \d
+  adresse: string | null; // nullable car pas de "not null" dans le \d
   createdAt: Date;
 }
 
-
 // récupération d'un utilisateur par son id
 
-async function getUserById(id:number) :Promise <PublicUser | null> {
-const result = await pool.query(
+async function getUserById(id: number): Promise<PublicUser | null> {
+  const result = await pool.query(
     `SELECT id, email, first_name AS "firstName", last_name AS "lastName", 
      role, agence_id AS "agenceId", is_active AS "isActive", 
      created_at AS "createdAt", updated_at AS "updatedAt" 
      FROM users WHERE id = $1`,
 
-    [id]
+    [id],
   );
   if (result.rows.length === 0) {
     return null;
@@ -52,17 +55,24 @@ async function findUserByEmail(email: string): Promise<User | null> {
      created_at AS "createdAt", updated_at AS "updatedAt" 
      FROM users WHERE email = $1`,
 
-    [email]
+    [email],
   );
-  if (( result).rows.length === 0) {
+  if (result.rows.length === 0) {
     return null;
   }
-  return ( result).rows[0] as User;
+  return result.rows[0] as User;
 }
 
 // création d'un utilisateur avec email, passwordHash, firstName, lastName, role et agenceId
 
-async function createUser (userData:{  email: string; passwordHash: string; firstName: string; lastName: string; role: 'conseiller' | 'admin'; agenceId: number | null }) : Promise<PublicUser> {
+async function createUser(userData: {
+  email: string;
+  passwordHash: string;
+  firstName: string;
+  lastName: string;
+  role: "conseiller" | "admin";
+  agenceId: number | null;
+}): Promise<PublicUser> {
   const { email, passwordHash, firstName, lastName, role, agenceId } = userData;
   const result = await pool.query(
     `INSERT INTO users ( email, password_hash, first_name, last_name, role, agence_id) 
@@ -70,29 +80,29 @@ async function createUser (userData:{  email: string; passwordHash: string; firs
      RETURNING id, email, first_name AS "firstName", last_name AS "lastName", 
                role, agence_id AS "agenceId", is_active AS "isActive", 
                created_at AS "createdAt", updated_at AS "updatedAt"`,
-    [userData. email, passwordHash, firstName, lastName, role, agenceId]
+    [userData.email, passwordHash, firstName, lastName, role, agenceId],
   );
   return result.rows[0] as PublicUser;
 }
 
 // mise à jour d'un utilisateur avec possibilité de mettre à jour seulement certains champs
 
-async function updateUser (userData:{ id: number; email?: string; passwordHash?: string; firstName?: string; lastName?: string; role?: 'conseiller' | 'admin'; agenceId?: number | null; isActive?: boolean }) : Promise<PublicUser | null> {
-  const { id, email, passwordHash, firstName, lastName, role, agenceId, isActive } = userData
+async function updateUser(
+  id: number,
+  userData: Omit<UserUpdateInput, "password"> & { passwordHash: string },
+): Promise<PublicUser | null> {
+  const { email, firstName, lastName, passwordHash } = userData;
   const result = await pool.query(
     `UPDATE users 
      SET email = COALESCE($2, email),
          password_hash = COALESCE($3, password_hash),
          first_name = COALESCE($4, first_name),
          last_name = COALESCE($5, last_name),
-         role = COALESCE($6, role),
-         agence_id = COALESCE($7, agence_id),
-         is_active = COALESCE($8, is_active)
      WHERE id = $1
      RETURNING id, email, first_name AS "firstName", last_name AS "lastName",
                role, agence_id AS "agenceId", is_active AS "isActive", 
                created_at AS "createdAt", updated_at AS "updatedAt"`,
-    [id, email, passwordHash, firstName, lastName, role, agenceId, isActive]
+    [id, email, passwordHash, firstName, lastName],
   );
   if (result.rows.length === 0) {
     return null;
@@ -110,7 +120,7 @@ async function desactivateUser(id: number): Promise<PublicUser | null> {
      RETURNING id, email, first_name AS "firstName", last_name AS "lastName",
                role, agence_id AS "agenceId", is_active AS "isActive",
                created_at AS "createdAt", updated_at AS "updatedAt"`,
-    [id]
+    [id],
   );
   if (result.rows.length === 0) {
     return null;
@@ -128,7 +138,7 @@ async function reactivateUser(id: number): Promise<PublicUser | null> {
      RETURNING id, email, first_name AS "firstName", last_name AS "lastName",
                role, agence_id AS "agenceId", is_active AS "isActive",
                created_at AS "createdAt", updated_at AS "updatedAt"`,
-    [id]
+    [id],
   );
   if (result.rows.length === 0) {
     return null;
@@ -136,9 +146,11 @@ async function reactivateUser(id: number): Promise<PublicUser | null> {
   return result.rows[0] as PublicUser;
 }
 
-
-//validation du role de l'utilisateur ainsi que l'agence a laquel il est affilié 
-async function validateUserAccount(id: number, data: validateUserInput): Promise<PublicUser | null> {
+//validation du role de l'utilisateur ainsi que l'agence a laquel il est affilié
+async function validateUserAccount(
+  id: number,
+  data: validateUserInput,
+): Promise<PublicUser | null> {
   const { role, agenceId } = data;
   const result = await pool.query(
     `UPDATE users
@@ -147,7 +159,7 @@ async function validateUserAccount(id: number, data: validateUserInput): Promise
      RETURNING id, email, first_name AS "firstName", last_name AS "lastName",
                role, agence_id AS "agenceId", is_active AS "isActive",
                created_at AS "createdAt", updated_at AS "updatedAt"`,
-    [id, role, agenceId]
+    [id, role, agenceId],
   );
   if (result.rows.length === 0) {
     return null;
@@ -155,4 +167,15 @@ async function validateUserAccount(id: number, data: validateUserInput): Promise
   return result.rows[0] as PublicUser;
 }
 
-export { User, PublicUser, Agence, getUserById, findUserByEmail, createUser, updateUser, desactivateUser, reactivateUser, validateUserAccount };
+export {
+  User,
+  PublicUser,
+  Agence,
+  getUserById,
+  findUserByEmail,
+  createUser,
+  updateUser,
+  desactivateUser,
+  reactivateUser,
+  validateUserAccount,
+};

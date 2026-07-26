@@ -72,6 +72,7 @@ export const userSchema = z.object({
         .min(5, { message: "L'email doit contenir au moins 5 caractères" })
         .max(255),
     ),
+    
   password: passwordSchema,
 
  
