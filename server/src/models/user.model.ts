@@ -2,6 +2,7 @@ import {
   userInputSchema,
   validateUserInput,
   UserUpdateInput,
+  UserInput,
 } from "../validator/users.validator";
 
 import { pool } from "../db";
@@ -65,22 +66,16 @@ async function findUserByEmail(email: string): Promise<User | null> {
 
 // création d'un utilisateur avec email, passwordHash, firstName, lastName, role et agenceId
 
-async function createUser(userData: {
-  email: string;
-  passwordHash: string;
-  firstName: string;
-  lastName: string;
-  role: "conseiller" | "admin";
-  agenceId: number | null;
-}): Promise<PublicUser> {
-  const { email, passwordHash, firstName, lastName, role, agenceId } = userData;
+async function createUser(
+  userData: Omit<UserInput, "password"> & { passwordHash: string },
+): Promise<PublicUser> {
+  const { email, passwordHash, firstName, lastName } = userData;
   const result = await pool.query(
-    `INSERT INTO users ( email, password_hash, first_name, last_name, role, agence_id) 
-     VALUES ($1, $2, $3, $4, $5, $6) 
+    `INSERT INTO users ( email, password_hash, first_name, last_name) 
+     VALUES ($1, $2, $3, $4) 
      RETURNING id, email, first_name AS "firstName", last_name AS "lastName", 
-               role, agence_id AS "agenceId", is_active AS "isActive", 
                created_at AS "createdAt", updated_at AS "updatedAt"`,
-    [userData.email, passwordHash, firstName, lastName, role, agenceId],
+    [email, passwordHash, firstName, lastName],
   );
   return result.rows[0] as PublicUser;
 }
