@@ -73,8 +73,9 @@ async function createUser(
   const result = await pool.query(
     `INSERT INTO users ( email, password_hash, first_name, last_name) 
      VALUES ($1, $2, $3, $4) 
-     RETURNING id, email, first_name AS "firstName", last_name AS "lastName", 
-               created_at AS "createdAt", updated_at AS "updatedAt"`,
+     RETURNING id, email, first_name AS "firstName", last_name AS "lastName",               
+     role, agence_id AS "agenceId", is_active AS "isActive", 
+     created_at AS "createdAt", updated_at AS "updatedAt"`,
     [email, passwordHash, firstName, lastName],
   );
   return result.rows[0] as PublicUser;
@@ -84,7 +85,7 @@ async function createUser(
 
 async function updateUser(
   id: number,
-  userData: Omit<UserUpdateInput, "password"> & { passwordHash: string },
+  userData: Omit<UserUpdateInput, "password"> & { passwordHash?: string },
 ): Promise<PublicUser | null> {
   const { email, firstName, lastName, passwordHash } = userData;
   const result = await pool.query(
@@ -92,7 +93,7 @@ async function updateUser(
      SET email = COALESCE($2, email),
          password_hash = COALESCE($3, password_hash),
          first_name = COALESCE($4, first_name),
-         last_name = COALESCE($5, last_name),
+         last_name = COALESCE($5, last_name)
      WHERE id = $1
      RETURNING id, email, first_name AS "firstName", last_name AS "lastName",
                role, agence_id AS "agenceId", is_active AS "isActive", 
