@@ -76,7 +76,7 @@ async function createUser(
      RETURNING id, email, first_name AS "firstName", last_name AS "lastName",               
      role, agence_id AS "agenceId", is_active AS "isActive", 
      created_at AS "createdAt", updated_at AS "updatedAt"`,
-    [email, passwordHash, firstName, lastName, "conseillier"],
+    [email, passwordHash, firstName, lastName, "conseiller"],
   );
   return result.rows[0] as PublicUser;
 }
@@ -163,6 +163,20 @@ async function validateUserAccount(
   return result.rows[0] as PublicUser;
 }
 
+
+// fonction pour recupere le passwordHash d'un utilisateur par son id (utile pour le changement de mot de passe)
+
+async function getPasswordHashById(id: number): Promise<string | null> {
+  const result = await pool.query(
+    `SELECT password_hash AS "passwordHash" FROM users WHERE id = $1`,
+    [id],
+  );
+  if (result.rows.length === 0) {
+    return null;
+  }
+  return result.rows[0].passwordHash as string;
+}
+
 export {
   User,
   PublicUser,
@@ -174,4 +188,5 @@ export {
   desactivateUser,
   reactivateUser,
   validateUserAccount,
+  getPasswordHashById
 };
