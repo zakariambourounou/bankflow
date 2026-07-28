@@ -66,7 +66,7 @@ async function findUserByEmail(email: string): Promise<User | null> {
 
 // création d'un utilisateur avec email, passwordHash, firstName, lastName, role et agenceId
 
-async function createUser(
+ async function createUser(
   userData: Omit<UserInput, "password"> & { passwordHash: string },
 ): Promise<PublicUser> {
   const { email, passwordHash, firstName, lastName,} = userData;
