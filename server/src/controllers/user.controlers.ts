@@ -5,16 +5,31 @@ import { createUser } from '../models/user.model';
 
 
 
+
+// hashage password
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+//fonction itulitaire de comparaison du schem et de la data envoye
+
+const validateData = <T>(schema : userSchema<T>, data):T =>{
+    const result = schema.safeParse(data)
+    if (!result){
+        throw new Error('Données invalides');
+    }
+
+    return result.data
+}
+
+
+
 //creation d'un utilisateur avec validation de données avec zod
 export const  createUserController = async (req: Request, res: Response) => {
-    const verifiedData = userSchema.safeParse(req.body);
+    const verifiedData = validateData(userSchema , req.body);
     if(!verifiedData.success){
         return res.status(400).json({
       message: 'Données invalides',
-      errors: verifiedData.error.issues,
+      errors: verifiedData.error.issues, 
     });
     }
 
@@ -39,4 +54,4 @@ export const updateUserController = async (req: Request, res: Response) => {
     if (isNaN(id)) {
       return res.status(400).json({ message: 'ID utilisateur invalide' });
     }
-    const 
+    const verificati
